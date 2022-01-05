@@ -15,6 +15,7 @@ db.once('open', () => console.log('Connected to Mongoose'))
 
 const indexRouter = require('./routes/index') //hooking up server to use my routes step 1- importing the route into our server
 const authorRouter = require('./routes/authors')
+const bookRouter = require('./routes/books')
 
 // configuring Express application
 app.set('view engine', 'ejs')
@@ -27,5 +28,6 @@ app.use(express.json())
 
 app.use('/', indexRouter) //hooking up server to use my routes step 2
 app.use('/authors', authorRouter)
+app.use('/books', bookRouter)
 
 app.listen(process.env.PORT || 3000)
