@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express')
 const expressLayouts = require('express-ejs-layouts')
 const app = express()
+const methodOverride = require('method-override')
 
 //INTEGRATING OUR MODEL - SETTING UP DB
 const mongoose = require('mongoose')
@@ -21,6 +22,7 @@ const bookRouter = require('./routes/books')
 app.set('view engine', 'ejs')
 app.set('views', __dirname + '/views') //setting where our views will be coming from
 app.set('layout', 'layouts/layout') // hook up express layout
+app.use(methodOverride('_method'))
 app.use(expressLayouts)
 app.use(express.static('public')) //telling express where our public files(eg style sheets, JS files, images) are going to be
 app.use(express.urlencoded({ limit: '10mb', extended: false }))

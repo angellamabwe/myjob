@@ -1,6 +1,8 @@
 const express = require('express')
+const { route } = require('express/lib/application')
 const router = express.Router()
 const Author = require('../models/author')
+const Book = require('../models/book')
 
 // All authors route
 router.get('/', async (req, res) => {
@@ -31,13 +33,75 @@ router.post('/', async (req, res) => {
     })
     try {
         const newAuthor = await author.save()
-        // res.redirect(`authors/${newAuthor.id}`)
-        res.redirect(`authors`)
+        res.redirect(`authors/${newAuthor.id}`)
+        // res.redirect(`authors`)
     } catch {
         res.render('authors/new', {
             author: author,
             errorMessage: 'Error Creating Author'
         })
+    }
+})
+
+// for showing single author
+router.get('/:id', async (req, res) => {
+    try {
+        const author = await Author.findById(req.params.id)
+        const books = await Book.find({ author: author.id }).limit(6).exec()
+        res.render('authors/show', {
+            author: author,
+            booksByAuthor: books
+        })
+    } catch (err) {
+        console.log(err);
+        res.redirect('/')
+    }
+})
+
+// route for editing author
+router.get('/:id/edit', async (req, res) => {
+    // res.send('Editing an author ' + req.params.id) //version 1
+    try {
+        const author = await Author.findById(req.params.id)
+        res.render('authors/edit', { author: author })
+    } catch {
+        res.redirect('/authors')
+    }
+})
+
+// Update route
+router.put('/:id', async (req, res) => {
+    let author
+    try {
+        author = await Author.findById(req.params.id)
+        author.name = req.body.name
+        await author.save()
+        res.redirect(`/authors/${author.id}`)
+    } catch {
+        if (author == null) {
+            res.redirect('/')
+        } else {
+            res.render('authors/edit', {
+                author: author,
+                errorMessage: 'Error updating Author'
+            })
+        }
+    }
+})
+
+// Delete author route
+router.delete('/:id', async (req, res) => {
+    let author
+    try {
+        author = await Author.findById(req.params.id)
+        await author.remove()
+        res.redirect('/authors')
+    } catch {
+        if (author == null) {
+            res.redirect('/')
+        } else {
+            res.redirect(`/authors/${author.id}`)
+        }
     }
 })
 
